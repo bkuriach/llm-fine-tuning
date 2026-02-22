@@ -1,9 +1,9 @@
 # llm-fine-tuning
-llm-fine-tuning
+Learn about fine-tuning large language models
 
 
-set up:
+## Setup:
 
-Create conda environment and activate
-pip install azure-ai-ml azure-identity
-pip install -r requirements.txt
+* `Create conda environment and activate`
+* `pip install azure-ai-ml azure-identity`
+* `pip install -r requirements.txt`
