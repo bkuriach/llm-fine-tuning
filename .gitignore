@@ -1,6 +1,9 @@
 # macOS metadata
 .DS_Store
 
+# VS Code personal settings (machine-specific; not useful to other devs)
+.vscode/
+
 # Secrets – never commit
 .env
 
