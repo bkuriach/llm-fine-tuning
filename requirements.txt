@@ -1,0 +1,45 @@
+# -------------------------------------------------------------------
+# Local development requirements
+# Install with: pip install -r requirements.txt
+#
+# For AML training, the environment is defined in aml/environment.yml
+# -------------------------------------------------------------------
+
+# HuggingFace stack
+transformers>=4.47.0
+datasets>=3.0.0
+tokenizers>=0.20.0
+huggingface_hub>=0.26.0
+
+# TRL (SFTTrainer)
+trl>=0.14.0
+
+# QLoRA
+peft>=0.14.0
+bitsandbytes>=0.45.0
+
+# Training utilities
+accelerate>=1.2.0
+scipy
+sentencepiece
+protobuf
+
+# Config
+pyyaml>=6.0
+
+# AML job submission (local machine only)
+azure-ai-ml>=1.23.0
+azure-identity>=1.19.0
+python-dotenv>=1.0.0
+
+# Logging
+mlflow>=2.16.0
+azureml-mlflow>=1.58.0
+
+# Misc
+tqdm
+
+# Evaluation metrics
+sacrebleu>=2.4.0
+bert-score>=0.3.13
+unbabel-comet>=2.2.1

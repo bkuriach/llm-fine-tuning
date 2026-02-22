@@ -1,3 +1,15 @@
+# macOS metadata
+.DS_Store
+
+# Secrets – never commit
+.env
+
+# Training outputsxsxs
+outputs/xs
+
+# HuggingFace cache
+.cache/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

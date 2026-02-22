@@ -1,0 +1,100 @@
+# -------------------------------------------------------------------
+# Base configuration – shared defaults for all models
+# Model-specific configs extend/override these values.
+# -------------------------------------------------------------------
+
+task: hinglish_translation
+
+# ── Data ────────────────────────────────────────────────────────────
+data:
+  train_file: "data/hinge_train.json"       # relative to project root
+  eval_split: 0.1                            # fraction held out for eval
+  max_samples: null                          # null = use all samples
+  max_seq_length: 512
+
+# ── Prompt ──────────────────────────────────────────────────────────
+prompt:
+  # When use_chat_template is true, the tokenizer's built-in chat template is
+  # used (apply_chat_template) so each model renders the correct special tokens
+  # (e.g. <|eot_id|> for LLaMA-3, <|im_end|> for Qwen, [INST] for Mistral).
+  # The raw `template` below is kept as the plain-text fallback.
+  use_chat_template: true
+  system_prompt: >
+    You are a translation assistant. Translate the given English sentence into
+    natural, conversational Hinglish — a blend of Hindi and English commonly
+    used in everyday Indian speech. Keep it fluent and idiomatic; do not
+    transliterate word-for-word.
+  template: |
+    Translate the following English sentence into natural, conversational Hinglish.
+
+    English: {input}
+    Hinglish: {output}
+
+# ── QLoRA ───────────────────────────────────────────────────────────
+qlora:
+  enabled: true
+  load_in_4bit: true
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_compute_dtype: "float16"
+  bnb_4bit_use_double_quant: true
+
+# ── LoRA ────────────────────────────────────────────────────────────
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+  # target_modules is model-specific – defined in each model config
+
+# ── Training ────────────────────────────────────────────────────────
+training:
+  output_dir: "outputs"
+  num_train_epochs: 3
+  per_device_train_batch_size: 2
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-4
+  warmup_steps: 50
+  lr_scheduler_type: "cosine"
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+
+  fp16: false
+  bf16: false
+  # Note: base model is loaded in 4-bit NF4 (memory-efficient) via qlora config.
+  # LoRA adapters (~42M trainable params) train in FP32 with no grad scaler.
+  # This is the correct approach for V100 (sm_70) + QLoRA.
+
+  logging_steps: 10
+  eval_strategy: "steps"
+  eval_steps: 200
+  save_strategy: "steps"
+  save_steps: 200
+  save_total_limit: 2
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
+
+  gradient_checkpointing: true
+  optim: "adamw_torch"        # paged_adamw_8bit uses BF16 internally, breaks V100 FP16 grad scaler
+  report_to: "none"            # set to "mlflow" inside AML
+  seed: 42
+
+# ── Inference (post-training eval) ─────────────────────────────────
+inference:
+  batch_size: 4
+  max_new_tokens: 128
+  num_beams: 4               # beam search for more coherent outputs
+  no_repeat_ngram_size: 3   # prevent repetitive phrases
+
+# ── Evaluation metrics ───────────────────────────────────────────────
+evaluation:
+  bertscore_model: "xlm-roberta-large"   # multilingual backbone; handles Hinglish well
+  comet_model: "Unbabel/wmt22-comet-da"  # neural MT metric correlated with human judgement
+  skip_comet: false                       # set true to speed up local runs
+
+# ── Hugging Face Hub ────────────────────────────────────────────────
+hub:
+  push_to_hub: false
+  hub_model_id: null

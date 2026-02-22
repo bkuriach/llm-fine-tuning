@@ -1,0 +1,42 @@
+# -------------------------------------------------------------------
+# Mistral fine-tuning config
+# Inherits defaults from base_config.yaml; overrides listed here.
+# -------------------------------------------------------------------
+
+base: "configs/base_config.yaml"
+
+model:
+  name: "mistralai/Mistral-7B-Instruct-v0.3"
+  # alternatives:
+  #   - mistralai/Mistral-7B-v0.1
+  #   - mistralai/Mistral-Nemo-Instruct-2407
+  torch_dtype: "float16"
+  attn_implementation: "eager"   # V100 (Volta/sm_70) does not support Flash Attention 2
+
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+data:
+  max_samples: null    # set to null to use all ~4800 samples
+
+training:
+  output_dir: "outputs/mistral"
+  num_train_epochs: 3
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-4
+  fp16: false
+  bf16: false
+  optim: "adamw_torch"

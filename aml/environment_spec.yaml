@@ -1,0 +1,17 @@
+# -------------------------------------------------------------------
+# Azure ML environment definition for QLoRA SFT training
+#
+# Base image: PyTorch 2.4 + CUDA 12.4 (ACPT – Azure Container for PyTorch)
+# -------------------------------------------------------------------
+
+$schema: https://azuremlschemas.azureedge.net/latest/environment.schema.json
+
+name: sft-qlora-env
+version: "5"
+description: "QLoRA SFT environment – PyTorch 2.x, TRL 0.14, PEFT 0.14, BitsAndBytes"
+
+# Confirmed-working AML base image (same as your other projects).
+# CUDA-enabled PyTorch wheels are pulled via pip in environment.yml.
+image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest
+
+conda_file: environment.yml
